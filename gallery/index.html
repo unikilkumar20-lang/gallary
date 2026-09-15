@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Lumina Gallery — Modern, high-performance image gallery showcase featuring Masonry, Grid, Square, and Spotlight views with EXIF inspector, live photo filters, and pan & zoom lightbox.">
+  <title>Lumina — Next-Gen Pro Image Gallery</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238b5cf6'><path d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Ambient Dynamic Glow Canvas -->
+  <div class="ambient-glow" id="ambientGlow" aria-hidden="true">
+    <div class="ambient-blob ambient-blob-1" id="ambientBlob1"></div>
+    <div class="ambient-blob ambient-blob-2" id="ambientBlob2"></div>
+    <div class="ambient-blob ambient-blob-3" id="ambientBlob3"></div>
+  </div>
+
+  <!-- Ambient Subtle Dot Mesh -->
+  <div class="ambient-mesh" aria-hidden="true"></div>
+
+  <!-- Application Root Container -->
+  <div class="lumina-container">
+
+    <!-- FLOATING NAVBAR -->
+    <header class="navbar" id="navbar">
+      <!-- Brand Logo -->
+      <a href="#" class="brand-logo" id="brandLogo" title="Lumina Gallery Home">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="4" ry="4"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+        </div>
+        <span class="brand-title">Lumina<span>Gallery</span></span>
+      </a>
+
+      <!-- Live Search Bar -->
+      <div class="search-wrapper" id="searchWrapper">
+        <span class="search-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="Search by title, location, tag, camera..." 
+          autocomplete="off" 
+          spellcheck="false"
+        >
+        <button class="search-clear-btn" id="searchClearBtn" title="Clear search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Navigation Actions -->
+      <div class="nav-actions">
+        <button class="btn btn-glass" id="btnFavoritesFilter" title="View your saved favorites">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+          <span class="nav-fav-text">Favorites (<span id="navFavCount">0</span>)</span>
+        </button>
+
+        <button class="btn btn-primary" id="btnOpenUploadModal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Upload</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- HERO PRESENTATION BANNER -->
+    <section class="hero-section" id="heroSection">
+      <div class="hero-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+        Curated Masterpieces
+      </div>
+      <h1 class="hero-title">Immerse in <span class="gradient-text">Visual Brilliance</span></h1>
+      <p class="hero-subtitle">
+        Explore breathtaking architectural wonders, neon cyberpunk nights, dramatic alpine vistas, and emotive fine-art portraits.
+      </p>
+    </section>
+
+    <!-- INTERACTIVE CONTROLS TOOLBAR -->
+    <section class="toolbar-section" id="toolbarSection" aria-label="Gallery controls and filters">
+      
+      <!-- Primary Row: Category Pills & Layout Controls -->
+      <div class="toolbar-primary">
+        <!-- Category Filter Pills -->
+        <nav class="category-pills" id="categoryPills" aria-label="Category filters">
+          <button class="filter-pill active" data-category="all">
+            <span>All Works</span>
+          </button>
+          <button class="filter-pill" data-category="cyberpunk">
+            <span>Cyberpunk</span>
+          </button>
+          <button class="filter-pill" data-category="architecture">
+            <span>Architecture</span>
+          </button>
+          <button class="filter-pill" data-category="nature">
+            <span>Nature</span>
+          </button>
+          <button class="filter-pill" data-category="portraits">
+            <span>Portraits</span>
+          </button>
+          <button class="filter-pill" data-category="street">
+            <span>Street Noir</span>
+          </button>
+          <button class="filter-pill" data-category="abstract">
+            <span>Abstract</span>
+          </button>
+        </nav>
+
+        <!-- Secondary Controls: Layout, Orientation & Sort -->
+        <div class="toolbar-controls">
+          <!-- Orientation Selector -->
+          <div class="custom-select-wrapper">
+            <select class="custom-select" id="selectOrientation" aria-label="Filter by orientation">
+              <option value="all">All Orientations</option>
+              <option value="landscape">Landscape</option>
+              <option value="portrait">Portrait</option>
+              <option value="square">Square</option>
+            </select>
+            <span class="select-arrow" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </span>
+          </div>
+
+          <!-- Sort Selector -->
+          <div class="custom-select-wrapper">
+            <select class="custom-select" id="selectSort" aria-label="Sort photos">
+              <option value="featured">Sort: Featured</option>
+              <option value="likes">Sort: Most Liked</option>
+              <option value="newest">Sort: Newest</option>
+            </select>
+            <span class="select-arrow" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </span>
+          </div>
+
+          <!-- Layout Switcher Group -->
+          <div class="layout-switch-group" role="group" aria-label="Layout view options">
+            <button class="layout-btn active" data-layout="masonry" id="btnLayoutMasonry" title="Masonry Flow Layout">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="11" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="6" rx="1.5"></rect>
+                <rect x="3" y="16" width="7" height="5" rx="1.5"></rect>
+                <rect x="14" y="11" width="7" height="10" rx="1.5"></rect>
+              </svg>
+            </button>
+            <button class="layout-btn" data-layout="grid" id="btnLayoutGrid" title="Editorial Grid Layout">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+              </svg>
+            </button>
+            <button class="layout-btn" data-layout="square" id="btnLayoutSquare" title="Minimal Square Layout">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="5" height="5" rx="1"></rect>
+                <rect x="10" y="3" width="5" height="5" rx="1"></rect>
+                <rect x="17" y="3" width="5" height="5" rx="1"></rect>
+                <rect x="3" y="10" width="5" height="5" rx="1"></rect>
+                <rect x="10" y="10" width="5" height="5" rx="1"></rect>
+                <rect x="17" y="10" width="5" height="5" rx="1"></rect>
+                <rect x="3" y="17" width="5" height="5" rx="1"></rect>
+                <rect x="10" y="17" width="5" height="5" rx="1"></rect>
+                <rect x="17" y="17" width="5" height="5" rx="1"></rect>
+              </svg>
+            </button>
+            <button class="layout-btn" data-layout="spotlight" id="btnLayoutSpotlight" title="Spotlight 3D Coverflow Carousel">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="6" y="4" width="12" height="16" rx="2"></rect>
+                <path d="M2 7v10"></path>
+                <path d="M22 7v10"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary Row: Dominant Color Filter & Photo Stats -->
+      <div class="toolbar-secondary">
+        <div class="color-filter-wrapper">
+          <span class="color-filter-label">Dominant Tone:</span>
+          <div class="color-swatches" id="colorSwatches">
+            <button class="color-swatch-btn color-swatch-all active" data-color="all" title="All Color Tones"></button>
+            <button class="color-swatch-btn" data-color="#ff007f" style="background-color: #ff007f;" title="Neon Pink / Magenta"></button>
+            <button class="color-swatch-btn" data-color="#00f0ff" style="background-color: #06b6d4;" title="Electric Cyan"></button>
+            <button class="color-swatch-btn" data-color="#1f6f28" style="background-color: #10b981;" title="Emerald Green"></button>
+            <button class="color-swatch-btn" data-color="#ff7e5f" style="background-color: #f97316;" title="Sunset Amber"></button>
+            <button class="color-swatch-btn" data-color="#7928ca" style="background-color: #8b5cf6;" title="Cosmic Violet"></button>
+            <button class="color-swatch-btn" data-color="#262626" style="background-color: #4b5563;" title="Monochrome Noir"></button>
+          </div>
+        </div>
+
+        <div class="gallery-stats" id="galleryStats">
+          Showing <strong id="visibleCount">12</strong> of <strong id="totalCount">12</strong> works
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN GALLERY CONTAINER -->
+    <main class="gallery-container layout-masonry" id="galleryContainer" aria-live="polite">
+      <!-- Cards dynamically injected by gallery.js -->
+    </main>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <line x1="8" y1="11" x2="14" y2="11"></line>
+        </svg>
+      </div>
+      <h2 class="empty-title">No matching captures found</h2>
+      <p class="empty-desc">Try clearing your search query or selecting a different category or color filter.</p>
+      <button class="btn btn-glass" id="btnResetFilters">Reset All Filters</button>
+    </div>
+
+  </div> <!-- End .lumina-container -->
+
+  <!-- ===================================================================
+       FULLSCREEN PRO LIGHTBOX MODAL
+       =================================================================== -->
+  <div class="lightbox-modal" id="lightboxModal" role="dialog" aria-modal="true" aria-hidden="true">
+    
+    <!-- Slideshow Progress Line -->
+    <div class="slideshow-progress-bar" id="slideshowProgressBar"></div>
+
+    <!-- Lightbox Header -->
+    <header class="lightbox-header">
+      <div class="lightbox-author">
+        <img src="" alt="" class="lightbox-author-img" id="lightboxAuthorImg">
+        <div>
+          <div class="lightbox-author-name" id="lightboxAuthorName">Photographer</div>
+          <div class="lightbox-author-handle" id="lightboxAuthorHandle">@handle</div>
+        </div>
+      </div>
+
+      <div class="lightbox-top-actions">
+        <!-- Autoplay Slideshow Button -->
+        <button class="lightbox-btn" id="btnToggleSlideshow" title="Play / Pause Slideshow (Space)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="slideshowIcon">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+        </button>
+
+        <!-- Toggle Adjustments / Filters Drawer -->
+        <button class="lightbox-btn" id="btnToggleFiltersDrawer" title="Adjust Photo Filters">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </button>
+
+        <!-- Toggle Info / EXIF Drawer -->
+        <button class="lightbox-btn active" id="btnToggleInfoDrawer" title="Camera EXIF & Details (I)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+        </button>
+
+        <!-- Like Button in Lightbox -->
+        <button class="lightbox-btn" id="lightboxLikeBtn" title="Save to Favorites">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
+
+        <!-- Download Button -->
+        <button class="lightbox-btn" id="lightboxDownloadBtn" title="Download High-Res Original">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </button>
+
+        <!-- Fullscreen Window Toggle -->
+        <button class="lightbox-btn" id="lightboxFullscreenBtn" title="Fullscreen (F)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+        </button>
+
+        <!-- Close Lightbox Button -->
+        <button class="lightbox-btn lightbox-close-btn" id="lightboxCloseBtn" title="Close Lightbox (Esc)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Lightbox Main Stage -->
+    <div class="lightbox-body">
+      <div class="lightbox-stage" id="lightboxStage">
+        <!-- Prev / Next Navigation Buttons -->
+        <button class="lightbox-nav-btn lightbox-nav-prev" id="lightboxNavPrev" title="Previous (Left Arrow)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button class="lightbox-nav-btn lightbox-nav-next" id="lightboxNavNext" title="Next (Right Arrow)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+
+        <!-- Zoomable & Pannable Image Canvas -->
+        <div class="lightbox-image-wrapper" id="lightboxImageWrapper">
+          <img src="" alt="" class="lightbox-img" id="lightboxImg">
+        </div>
+
+        <!-- Floating Zoom & Pan Controls -->
+        <div class="lightbox-stage-controls">
+          <button class="stage-control-btn" id="btnZoomOut" title="Zoom Out (-)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+          </button>
+          <span class="zoom-level-indicator" id="zoomIndicator">100%</span>
+          <button class="stage-control-btn" id="btnZoomIn" title="Zoom In (+)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+          </button>
+          <button class="stage-control-btn" id="btnZoomReset" title="Reset Scale (0)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Slide-in Drawer: EXIF & Filters -->
+      <aside class="lightbox-drawer open" id="lightboxDrawer">
+        <nav class="drawer-tab-nav">
+          <button class="drawer-tab-btn active" data-tab="details" id="tabDetailsBtn">Specifications</button>
+          <button class="drawer-tab-btn" data-tab="filters" id="tabFiltersBtn">Filters & Presets</button>
+        </nav>
+
+        <!-- Pane 1: Details & EXIF -->
+        <div class="drawer-pane active" id="paneDetails">
+          <h2 class="drawer-title" id="drawerTitle">Photo Title</h2>
+          <p class="drawer-desc" id="drawerDesc">Photo description will be placed here.</p>
+
+          <div class="drawer-section-title">Camera & Exposure Data</div>
+          <div class="exif-grid">
+            <div class="exif-item">
+              <span class="exif-label">Camera</span>
+              <span class="exif-value" id="exifCamera">—</span>
+            </div>
+            <div class="exif-item">
+              <span class="exif-label">Lens</span>
+              <span class="exif-value" id="exifLens">—</span>
+            </div>
+            <div class="exif-item">
+              <span class="exif-label">Focal Length</span>
+              <span class="exif-value" id="exifFocal">—</span>
+            </div>
+            <div class="exif-item">
+              <span class="exif-label">Aperture</span>
+              <span class="exif-value" id="exifAperture">—</span>
+            </div>
+            <div class="exif-item">
+              <span class="exif-label">Shutter Speed</span>
+              <span class="exif-value" id="exifShutter">—</span>
+            </div>
+            <div class="exif-item">
+              <span class="exif-label">ISO</span>
+              <span class="exif-value" id="exifIso">—</span>
+            </div>
+            <div class="exif-item">
+              <span class="exif-label">Dimensions</span>
+              <span class="exif-value" id="exifDimensions">—</span>
+            </div>
+            <div class="exif-item">
+              <span class="exif-label">Location</span>
+              <span class="exif-value" id="exifLocation">—</span>
+            </div>
+          </div>
+
+          <!-- Extracted Color Palette -->
+          <div class="drawer-section-title">Color Palette (Click to Copy)</div>
+          <div class="palette-chips" id="drawerPaletteChips"></div>
+
+          <!-- Tags -->
+          <div class="drawer-section-title">Tags</div>
+          <div class="drawer-tags" id="drawerTags"></div>
+        </div>
+
+        <!-- Pane 2: Live Filters & Adjustments -->
+        <div class="drawer-pane" id="paneFilters">
+          <div class="drawer-section-title">Curated Aesthetic Presets</div>
+          <div class="preset-pills-grid" id="presetPillsGrid">
+            <!-- Preset buttons generated dynamically -->
+          </div>
+
+          <div class="drawer-section-title">Fine Adjustments</div>
+
+          <div class="filter-slider-group">
+            <div class="filter-slider-header">
+              <span class="filter-slider-label">Brightness</span>
+              <span class="filter-slider-val" id="valBrightness">100%</span>
+            </div>
+            <input type="range" class="filter-range" id="sliderBrightness" min="40" max="180" value="100">
+          </div>
+
+          <div class="filter-slider-group">
+            <div class="filter-slider-header">
+              <span class="filter-slider-label">Contrast</span>
+              <span class="filter-slider-val" id="valContrast">100%</span>
+            </div>
+            <input type="range" class="filter-range" id="sliderContrast" min="40" max="200" value="100">
+          </div>
+
+          <div class="filter-slider-group">
+            <div class="filter-slider-header">
+              <span class="filter-slider-label">Saturation</span>
+              <span class="filter-slider-val" id="valSaturate">100%</span>
+            </div>
+            <input type="range" class="filter-range" id="sliderSaturate" min="0" max="250" value="100">
+          </div>
+
+          <div class="filter-slider-group">
+            <div class="filter-slider-header">
+              <span class="filter-slider-label">Sepia Warmth</span>
+              <span class="filter-slider-val" id="valSepia">0%</span>
+            </div>
+            <input type="range" class="filter-range" id="sliderSepia" min="0" max="100" value="0">
+          </div>
+
+          <div class="filter-slider-group">
+            <div class="filter-slider-header">
+              <span class="filter-slider-label">Grayscale</span>
+              <span class="filter-slider-val" id="valGrayscale">0%</span>
+            </div>
+            <input type="range" class="filter-range" id="sliderGrayscale" min="0" max="100" value="0">
+          </div>
+
+          <div class="filter-slider-group">
+            <div class="filter-slider-header">
+              <span class="filter-slider-label">Hue Shift</span>
+              <span class="filter-slider-val" id="valHueRotate">0°</span>
+            </div>
+            <input type="range" class="filter-range" id="sliderHueRotate" min="-180" max="180" value="0">
+          </div>
+
+          <div class="filter-actions">
+            <button class="btn btn-glass" id="btnResetFiltersControls" style="flex: 1;">Reset All</button>
+            <button class="btn btn-primary" id="btnCopyCssFilter" style="flex: 1;">Copy CSS</button>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       UPLOAD PHOTO MODAL
+       =================================================================== -->
+  <div class="modal-backdrop" id="uploadModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Publish Photograph</h2>
+        <button class="lightbox-btn lightbox-close-btn" id="btnCloseUploadModal" title="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <input type="file" id="uploadFileInput" accept="image/*" style="display: none;">
+
+      <div class="dropzone" id="uploadDropzone">
+        <div class="dropzone-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+        </div>
+        <div class="dropzone-text">Drag & drop your photograph here</div>
+        <div class="dropzone-subtext">Supports PNG, JPG, WebP, AVIF up to 25MB • or click to browse</div>
+      </div>
+
+      <div class="upload-preview-container" id="uploadPreviewContainer">
+        <img src="" alt="Upload preview" class="upload-preview-img" id="uploadPreviewImg">
+      </div>
+
+      <form id="uploadForm">
+        <div class="upload-form-group">
+          <label class="upload-label" for="uploadTitle">Title</label>
+          <input type="text" class="upload-input" id="uploadTitle" placeholder="e.g. Celestial Aurora Over Lofoten" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="upload-form-group">
+            <label class="upload-label" for="uploadCategory">Category</label>
+            <select class="upload-input" id="uploadCategory">
+              <option value="nature">Nature</option>
+              <option value="cyberpunk">Cyberpunk</option>
+              <option value="architecture">Architecture</option>
+              <option value="portraits">Portraits</option>
+              <option value="street">Street Noir</option>
+              <option value="abstract">Abstract</option>
+            </select>
+          </div>
+          <div class="upload-form-group">
+            <label class="upload-label" for="uploadPhotographer">Creator Handle</label>
+            <input type="text" class="upload-input" id="uploadPhotographer" placeholder="@your_lens">
+          </div>
+        </div>
+
+        <div class="upload-form-group">
+          <label class="upload-label" for="uploadTags">Tags (comma separated)</label>
+          <input type="text" class="upload-input" id="uploadTags" placeholder="Landscape, Sunset, Horizon">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;" id="btnSubmitUpload">
+          Add to Gallery
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="gallery.js"></script>
+</body>
+</html>
